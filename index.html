@@ -22,7 +22,7 @@
         .card { background: white; border-radius: 12px; padding: 15px; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
         .card img { width: 100%; height: 160px; object-fit: cover; border-radius: 8px; }
 
-        /* Estilos del reproductor definitivo */
+        /* Estilos del reproductor */
         #videoModal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); z-index:9999; flex-direction:column; align-items:center; justify-content:center; }
         #player { width: 95%; max-width: 1000px; max-height: 80vh; background: #000; border-radius: 8px; }
         .btn-back { margin-top: 20px; background: var(--accent); color: white; padding: 10px 25px; border: none; border-radius: 5px; cursor: pointer; }
@@ -55,10 +55,8 @@
 </div>
 
 <script>
-    // --- CONFIGURACIÓN ---
     const API_URL = "https://script.google.com/macros/s/AKfycbyZhtOlrQOuSfzx9j0asVVZ4IspVzB_dDKWctCcLcUzSGsAn3d_TWqagUywUpLPHSPq/exec"; // REEMPLAZA CON TU URL
 
-    // --- LÓGICA DE LOGIN ---
     async function login() {
         const u = document.getElementById('usuario').value;
         const p = document.getElementById('clave').value;
@@ -83,7 +81,6 @@
         }
     }
 
-    // --- LÓGICA DE DASHBOARD ---
     async function cargarDashboard() {
         document.getElementById('login-box').style.display = 'none';
         document.getElementById('loader').style.display = 'block';
@@ -102,24 +99,16 @@
         document.getElementById('dashboard').style.display = 'block';
     }
 
-    // --- REPRODUCTOR DE STREAMING (SOLUCIÓN BLOB) ---
-    async function abrirVideo(url) {
+    // --- REPRODUCTOR DIRECTO ---
+    function abrirVideo(url) {
         const video = document.getElementById('player');
         const modal = document.getElementById('videoModal');
         
+        video.src = url;
+        video.load();
         modal.style.display = 'flex';
         
-        try {
-            const response = await fetch(url);
-            const blob = await response.blob();
-            const blobUrl = URL.createObjectURL(blob);
-            
-            video.src = blobUrl;
-            video.play();
-        } catch (e) {
-            alert("Error al procesar el video: " + e.message);
-            modal.style.display = 'none';
-        }
+        video.play().catch(e => console.log("Se requiere play manual"));
     }
 
     function cerrarModal() {
