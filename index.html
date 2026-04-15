@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mentalidad Deportiva - Drive Player</title>
+    <title>Mentalidad Deportiva</title>
     <style>
         :root { --primary: #003366; --accent: #FF9900; --bg: #f4f7f6; }
         body { font-family: sans-serif; background: var(--bg); margin: 0; padding: 20px; }
@@ -22,6 +22,7 @@
         .card { background: white; border-radius: 12px; padding: 15px; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
         .card img { width: 100%; height: 160px; object-fit: cover; border-radius: 8px; }
 
+        /* Reproductor Modal */
         #videoModal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); z-index:9999; flex-direction:column; align-items:center; justify-content:center; }
         #player { width: 95%; max-width: 1000px; max-height: 80vh; background: #000; border-radius: 8px; }
         .btn-back { margin-top: 20px; background: var(--accent); color: white; padding: 10px 25px; border: none; border-radius: 5px; cursor: pointer; }
@@ -97,17 +98,22 @@
         const modal = document.getElementById('videoModal');
         let finalUrl = url;
 
-        // Si es un enlace de Drive, lo convertimos a enlace directo de reproducción
+        // Lógica para detectar el ID de Google Drive y convertirlo a Direct Stream
         if (url.includes("drive.google.com")) {
-            const id = url.split('/d/')[1].split('/')[0];
-            finalUrl = `https://lh3.googleusercontent.com/u/0/d/${id}`;
-            // Alternativa si la anterior falla: `https://docs.google.com/uc?export=download&id=${id}`
+            const parts = url.split('/d/');
+            if (parts.length > 1) {
+                const id = parts[1].split('/')[0];
+                // Formato de streaming compatible con Chrome para evitar descargas
+                finalUrl = `https://docs.google.com/uc?export=open&id=${id}`;
+            }
         }
 
         video.src = finalUrl;
         video.load();
         modal.style.display = 'flex';
-        video.play().catch(e => console.log("Play manual necesario"));
+        video.play().catch(e => {
+            console.log("El navegador requiere interacción manual para reproducir.");
+        });
     }
 
     function cerrarModal() {
